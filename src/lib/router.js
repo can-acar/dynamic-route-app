@@ -199,7 +199,7 @@ const Router = (props) => {
   
     return contexts;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [import.meta.glob, routerOptions]);
+  }, [require.context, routerOptions]);
   
   
   useEffect(() => {
