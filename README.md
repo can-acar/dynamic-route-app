@@ -1,70 +1,79 @@
-# Getting Started with Create React App
+#  Create-React-App Dynamic Router
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This custom dynamic router is designed for Create-React-App projects, providing a routing solution similar to the Next.js framework without relying on `react-router-dom`. It enables dynamic imports, customizable routing configurations, and efficient route matching and navigation.
 
-## Available Scripts
+#  Features
 
-In the project directory, you can run:
+-   Dynamic imports with `React.lazy` and `Suspense`
+-   Customizable routing options with support for file extensions and directory paths
+-   Route matching using the `path-to-regexp` library
+-   Router context for easy access to routing information in child components
+-   Browser history management with the `window.history` API
 
-### `npm start`
+## Installation
+1.  Copy the `Router.js` file and the `router-context.js` file into your Create-React-App project.
+2.  Import and use the `Router` component in your `App.js` or another top-level component.
+## Usage
+To use the dynamic router, wrap your main application component with the `Router` component:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+    import React from "react";
+    import Router from "./path/to/Router";
+    
+    const options = {  
+	  ext: ['jsx', 'js'],  
+	  dirs: [{  
+	  dir: './pages',  
+	  baseRouter: '/index',  
+	  }, {  
+	  dir: './admin',  
+	  baseRouter: '/index',  
+	  }]  
+	}
+	
+    function App() {
+      return (
+        <Router options={options}/>
+      );
+    }
+    
+    export default App;
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Creating Pages
+Create your pages inside the `src/pages` directory (or another directory specified in the `options` prop). Use `.js` or `.jsx` extensions for your page components. To define dynamic routes, use the `[param]` syntax for required parameters and `[[...param]]` for optional parameters.
 
-### `npm test`
+Example:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+-   `src/pages/index.js` - Home page
+-   `src/pages/about.js` - About page
+-   `src/pages/blog/[postId].js` - Blog post page with required `postId` parameter
 
-### `npm run build`
+## Accessing Route Information and Navigation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Use the `useContext` hook to access the `RouterContext` and its properties in your page components:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+    import React, { useContext } from "react";
+    import RouterContext from "./path/to/router-context";
+    
+    function MyPageComponent() {
+      const { location, query, navigate } = useContext(RouterContext);
+    
+      // Access route information and navigate to a different page
+    }
+    
+    export default MyPageComponent;
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Customizing Router Options
 
-### `npm run eject`
+You can customize the `Router` component by passing an optional `options` prop:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+    <Router options={{
+      ext: ['jsx', 'js'],
+      dirs: [{
+        dir: './pages',
+        baseRouter: '/index',
+      }]
+    }}/>
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## License
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is licensed under the MIT License.
