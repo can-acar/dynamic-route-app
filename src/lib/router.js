@@ -56,8 +56,10 @@ const generateComponent = async (pathname, pages, options) => {
   
   if (!isMatch) {
   
+    let filename = `${options.dirs[0].dir}/NotFound.${options.ext[0]}`.replace('./', '');
+    
     component = {
-      componentPath: `${options.dirs[0].dir}/NotFound.${options.ext[0]}`,
+      componentPath: filename,
       name: "NotFound",
       isReady: true,
     }
@@ -199,7 +201,7 @@ const Router = (props) => {
   
     return contexts;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [import.meta.glob, routerOptions]);
+  }, [require.context, routerOptions]);
   
   
   useEffect(() => {
