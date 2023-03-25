@@ -1,4 +1,4 @@
-import useRouter from "lib/use-router.js";
+import useRouter from "src/lib/use-router";
 
 const DefaultPage = (props) => {
   const router = useRouter()
