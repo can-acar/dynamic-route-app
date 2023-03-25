@@ -6,9 +6,9 @@ import RouterContext from './router-context';
 const getQueryParams = (filename, options) => {
   
   const dirOptions = options.dirs.find((dirOption) => filename.includes(dirOption.dir));
-  
+
   return filename
-      .replace(`../${dirOptions.dir}`, '')
+      .replace(`${dirOptions.dir}`, '')
       .replace(new RegExp(`\\.(${options.ext.join('|')})$`), '')
       .split('/')
       .filter((part) => part.startsWith('[') && part.endsWith(']'))
@@ -26,12 +26,12 @@ const generateComponent = async (pathname, pages, options) => {
   }
   
   for (const filename of pages && Object.keys(pages)) {
-    
-    
+  
+  
     const dirOptions = options.dirs.find((dirOption) => filename.includes(dirOption.dir));
-    
+  
     const pattern = filename
-        .replace(`../${dirOptions.dir}`, '')
+        .replace(`${dirOptions.dir}`, '')
         .replace(new RegExp(`\\.(${options.ext.join('|')})$`), '')
         .replace(/\[(\w+)\]/g, `:$1`)
         .replace(/\[\[\.\.\.(\w+)\]\]/g, `:$1([^/]+/?)*`) //[[...slug]] optional params
@@ -41,11 +41,12 @@ const generateComponent = async (pathname, pages, options) => {
     const re = pathToRegexp(pattern, keys);
     
     const match = re.exec(pathname);
-    
+  
     if (match) {
+
       isMatch = true;
       component = {
-        componentPath: filename,
+        componentPath: filename.replace('./', ''),
         name: filename.split('/').pop().replace(/\.[^/.]+$/, ""),
         isReady: true,
       };
@@ -54,8 +55,9 @@ const generateComponent = async (pathname, pages, options) => {
   }
   
   if (!isMatch) {
+  
     component = {
-      componentPath: `../${options.dirs[0].dir}/NotFound.${options.ext[0]}`,
+      componentPath: `${options.dirs[0].dir}/NotFound.${options.ext[0]}`,
       name: "NotFound",
       isReady: true,
     }
@@ -81,13 +83,14 @@ const matchRoute = async (pathname, pages, options) => {
   }
   
   for (const filename of pages && Object.keys(pages)) {
+
     let keys = [];
     slug = getQueryParams(filename, options);
     
     const dirOptions = options.dirs.find((dirOption) => filename.includes(dirOption.dir));
-    
+
     let pattern = filename
-        .replace(`../${dirOptions.dir}`, '')
+        .replace(`${dirOptions.dir}`, '')
         .replace(new RegExp(`\\.(${options.ext.join('|')})$`), '')
         .replace(/\[(\w+)\]/g, `:$1`)
         .replace(/\[\[\.\.\.(\w+)\]\]/g, `:$1([^/]+/?)*`)  //[[...slug]] optional params
@@ -150,7 +153,7 @@ const Router = (props) => {
   const routerOptions = props.options || {
     ext: ['jsx', 'js'],
     dirs: [{
-      dir: 'src/pages',
+      dir: './src/pages',
       baseRouter: '/index',
     }]
   }
@@ -175,16 +178,25 @@ const Router = (props) => {
   });
   
   const pagesContext = useMemo(() => {
-    
+  
     const contexts = {};
+  
+  
+    const context = require.context(`../../src/`, true, /\.js|.jsx$/, 'lazy');
+  
+  
+    for (const filename of context.keys()) {
     
-    // eslint-disable-next-line no-unused-vars
-    for (const dirOptions of routerOptions.dirs) {
-      debugger
-      const context = require.context(`../pages/**/*.(jsx|js)`, {eager: true}) || {};
+      for (const dirOption of routerOptions.dirs) {
       
-      Object.assign(contexts, context);
+        if (filename.includes(dirOption.dir)) {
+        
+          contexts[filename] = context(filename);
+        }
+      }
     }
+  
+  
     return contexts;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [import.meta.glob, routerOptions]);
@@ -192,7 +204,6 @@ const Router = (props) => {
   
   useEffect(() => {
     const onPopState = () => {
-      // replace last trailing slash
       
       
       setLocation({
@@ -205,6 +216,7 @@ const Router = (props) => {
     window.history.replaceState(window.history.state, null, window.location.pathname);
     
     if (window.location.pathname.endsWith('/')) {
+  
       window.history.replaceState(window.history.state, null, window.location.pathname.slice(0, -1));
     }
     
@@ -217,16 +229,16 @@ const Router = (props) => {
   
   useEffect(() => {
     const bootstrap = async () => {
-      
-      
+  
+  
       const route = await matchRoute(location.pathname, pagesContext, routerOptions);
-      
+  
       const component = await generateComponent(location.pathname, pagesContext, routerOptions);
-      
+  
       setComponent(component);
-      
+  
       updateRoute(route);
-      
+  
     };
     
     bootstrap().then(() => {
@@ -251,7 +263,7 @@ const Router = (props) => {
   }
   
   
-  const PageComponent = React.lazy(async () => await import(/* @vite-ignore */component.componentPath))
+  const PageComponent = React.lazy(async () => await import(`../${component.componentPath}`))
   
   
   return (<RouterContext.Provider value={contextValue}>
