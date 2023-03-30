@@ -184,7 +184,7 @@ const Router = (props) => {
     const contexts = {};
   
   
-    const context = require.context(`../../src/`, true, /\.js|.jsx$/, 'lazy');
+    const context = require.context(`../../src/`, true, /\.js|.jsx|.ts|.tsx$/, 'lazy');
   
   
     for (const filename of context.keys()) {
